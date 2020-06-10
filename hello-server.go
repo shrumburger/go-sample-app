@@ -5,9 +5,9 @@ import (
 	"net/http"
 )
 
-// HTTP Handler - Hello, world
+// HTTP Handler - Hello, sunshine
 func hello(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "Hello, world!\n")
+	fmt.Fprintf(w, "Hello, sunshine!\n")
 }
 
 // HTTP Handler - Echo headers into response body
