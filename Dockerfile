@@ -7,6 +7,6 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -i -installsuffix cgo -o hello-server
 
 FROM scratch
-COPY --from=stage-0 /workspace/hello-server /
+COPY --from=0 /workspace/hello-server /
 USER 1001
 ENTRYPOINT ["/hello-server"]
