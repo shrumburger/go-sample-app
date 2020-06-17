@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	fmt.Printf("Env var: %s = %s \n", "environment", os.Getenv("environment"))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, world!\n")
 	})
