@@ -1,0 +1,84 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-pipeline
+spec:
+  params:
+    - name: repo-url
+      type: string
+      description: The Git repository URL to clone from.
+    - name: revision
+      type: string
+      description: The Git revision to clone.
+    - name: image
+      description: reference of the image to build
+  workspaces:
+    - name: shared-workspace
+      description: This workspace will receive the cloned git repo and be passed to the next Task.
+  tasks:
+    - name: fetch-repository
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: deleteExisting
+          value: "true"
+    - name: lint
+      taskRef:
+        name: golangci-lint
+      runAfter:
+        - fetch-repository
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: package
+          value: go-sample-app
+    - name: test
+      taskRef:
+        name: golang-test
+      runAfter:
+        - fetch-repository
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: package
+          value: go-sample-app
+    - name: build-image
+      taskRef:
+        name: kaniko
+      runAfter:
+        - fetch-repository
+        - lint
+        - test
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: IMAGE
+          value: $(params.image)
+    - name: verify-digest
+      runAfter:
+        - build-image
+      params:
+        - name: digest
+          value: $(tasks.build-image.results.IMAGE-DIGEST)
+      taskSpec:
+        params:
+          - name: digest
+        steps:
+          - name: bash
+            image: ubuntu
+            script: |
+              echo $(params.digest)
+              case .$(params.digest) in
+                ".sha"*) exit 0 ;;
+                *)       echo "Digest value is not correct" && exit 1 ;;
+              esac
