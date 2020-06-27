@@ -18,7 +18,7 @@ spec:
         app: go-sample-app
     spec:
       containers:
-      - image: andreasevers/go-sample-app:1.0.1
+      - image: springone-tour-2020-cicd/go-sample-app:1.0.1
         name: go-sample-app
         resources: {}
 status: {}
