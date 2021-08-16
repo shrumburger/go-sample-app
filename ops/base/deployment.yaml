@@ -5,7 +5,6 @@ metadata:
   labels:
     app: go-sample-app
   name: go-sample-app
-  namespace: prod
 spec:
   replicas: 1
   selector:
@@ -19,7 +18,7 @@ spec:
         app: go-sample-app
     spec:
       containers:
-        - image: shrum/go-sample-app:1.0.1
-          name: go-sample-app
-          resources: {}
+      - image: shrum/go-sample-app:1.0.1
+        name: go-sample-app
+        resources: {}
 status: {}
